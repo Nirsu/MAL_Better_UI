@@ -1,3 +1,10 @@
+import 'dart:io';
+import 'dart:math';
+import 'dart:convert';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:random_string/random_string.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/constants.dart';
 import '../../Components/rounded_button.dart';
@@ -10,10 +17,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
 
   openMALAuth() {
+    var code = randomString(128);
+    var hash = sha256.convert(ascii.encode(code));
+    String codeChallenge = base64Url.encode(hash.bytes).replaceAll("=", "").replaceAll("+", "-").replaceAll("/", "_");
+    String urlMAL = "https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=" + env['MAL_CLIENT_ID'] + "&code_challenge=" + codeChallenge + "&state=RequestID42";
+    debugPrint(codeChallenge.length.toString());
+    debugPrint(codeChallenge);
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyWebWiew('https://flutter.dev')
+        builder: (context) => MALLoginWebView(
+          url: urlMAL,
+          codeChallenge : codeChallenge,
+        )
       )
     );
   }
