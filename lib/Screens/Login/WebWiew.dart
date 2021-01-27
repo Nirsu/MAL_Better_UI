@@ -1,14 +1,12 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:js';
 
-import 'package:random_string/random_string.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:myapp/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:myapp/home.dart';
 
 class MALLoginWebView extends StatefulWidget {
 
@@ -30,16 +28,34 @@ class MALLoginWebViewState extends State<MALLoginWebView> {
   final String codeChallenge;
   MALLoginWebViewState(this.malLoginUrl, this.codeChallenge);
 
+  void getUserAccessToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    var response = await http.post('https://myanimelist.net/v1/oauth2/token', body: {
+      'client_id' : env['MAL_CLIENT_ID'],
+      'code': token,
+      'code_verifier': this.codeChallenge,
+      'grant_type': 'authorization_code',
+    });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> map = jsonDecode(response.body);
+      prefs.setString('access_token', map['access_token']);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     flutterWebViewPlugin.onUrlChanged.listen((String url) {
-      debugPrint(url);
       if (url.contains('?code=')) {
         String token = url.substring(url.indexOf('code=') + 5, url.indexOf('&state='));
+        getUserAccessToken(token);
         flutterWebViewPlugin.close();
-        debugPrint(token);
-        debugPrint(codeChallenge);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage()
+          )
+        );
       }
     });
   }
@@ -61,60 +77,6 @@ class MALLoginWebViewState extends State<MALLoginWebView> {
         withLocalStorage: true,
         hidden: true,
       ),
-    );
-  }
-}
-
-class MyWebWiew extends StatelessWidget {
-  final String url;
-  MyWebWiew(this.url);
-
-  final Completer<WebViewController> _controller = Completer<WebViewController>();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold (
-      body: Builder(builder: (BuildContext context) {
-        return WebviewScaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(0),
-            child: AppBar(backgroundColor: kPrimaryColor,),
-          ),
-          url: url,
-          withZoom: false,
-          hidden: true,
-          initialChild: Container(
-            color: kPrimaryColor,
-            child: const Center(
-              child: Text(
-                'Loading...',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        );
-        // return Scaffold (
-        //   appBar: PreferredSize(
-        //     preferredSize: Size.fromHeight(0),
-        //     child: AppBar(backgroundColor: kPrimaryColor,),
-        //   ),
-        //   body: WebView(
-        //     initialUrl: url,
-        //     javascriptMode: JavascriptMode.unrestricted,
-        //     onWebViewCreated: (WebViewController webViewController) {
-        //       _controller.complete(webViewController);
-        //     },
-        //     onPageStarted: (String url) {
-        //       debugPrint('Page started loading: $url');
-        //       print('Page started loading: $url');
-        //     },
-        //     onPageFinished: (String url) {
-        //       print('Page finished loading: $url');
-        //     },
-        //     gestureNavigationEnabled: true,
-        //   )
-        // );
-      })
     );
   }
 }
