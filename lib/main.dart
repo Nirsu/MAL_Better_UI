@@ -18,6 +18,10 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: kPrimaryColor,
       ),
       home: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(0),
+          child: AppBar(backgroundColor: kPrimaryColor,),
+        ),
         body: LoginPage(),
       ),
     );
