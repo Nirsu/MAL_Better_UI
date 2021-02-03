@@ -44,7 +44,6 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(this.accessToken);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0),

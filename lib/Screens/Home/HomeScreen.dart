@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/constants.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   HomeScreenState createState() => HomeScreenState();
@@ -9,10 +13,12 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
 
   TabController _tabController;
+  String accessToken;
 
   @override
   void initState() {
     super.initState();
+    _loadStorage();
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -22,18 +28,79 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     _tabController.dispose();
   }
 
+  _loadStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    this.accessToken = prefs.getString('access_token');
+  }
+
+  Widget _buildListTile(animeInfo) {
+    return ListTile(
+      leading: new Image.network(animeInfo['node']['main_picture']['large']),
+      title: new Text(animeInfo['node']['title']),
+      onTap: () => {},
+    );
+  }
+
+  Widget _buildList(list) {
+    Map<String, dynamic> listMap = jsonDecode(list.body);
+    dynamic listMapData = listMap['data'];
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return Card(
+          child: _buildListTile(listMapData[index]),
+        );
+      },
+      itemCount: listMapData.length,
+    );
+  }
+
+  Future<http.Response> getListAnime() async {
+    return http.get(
+      'https://api.myanimelist.net/v2/users/@me/animelist?status=watching&limit=20',
+      headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
+    );
+  }
+
+    Future<http.Response> getListManga() async {
+    return http.get(
+      'https://api.myanimelist.net/v2/users/@me/mangalist?status=reading&limit=20',
+      headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
+    );
+  }
+
+  Widget printList(function) {
+    return Scaffold (
+      body: FutureBuilder (
+        future: function,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return _buildList(snapshot.data);
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    );
+  }
+
   Widget getTabBar() {
     return TabBar(
       controller: _tabController,
-      indicatorColor: Colors.black,
-      labelColor: Colors.black,
+      indicatorColor: kSecondaryColor,
+      labelColor: kSecondaryColor,
       unselectedLabelColor: Colors.white,
       tabs: [
         Tab(
-          text: "Anime",
+          child: Center(
+            child: Text('Anime'),
+          ),
         ),
         Tab(
-          text: 'Manga',
+          child: Center(
+            child: Text('Manga'),
+          ),
         )
       ],
     );
@@ -43,12 +110,8 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     return TabBarView(
       controller: _tabController,
       children: [
-        Center(
-          child: Text('A for Anime'),
-        ),
-        Center(
-          child: Text('M for Manga'),
-        ),
+        this.printList(this.getListAnime()),
+        this.printList(this.getListManga()),
       ],
     );
   }
