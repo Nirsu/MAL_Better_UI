@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/constants.dart';
 
+import 'Screens/Home/HomeScreen.dart';
+
 class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
@@ -11,11 +13,8 @@ class HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
+  List<Widget> _widgetOptions = <Widget>[
+    HomeScreen(),
     Text(
       'Index 1: Search',
       style: optionStyle,
@@ -34,6 +33,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    super.initState();
     _loadStorage();
   }
 
@@ -44,6 +44,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(this.accessToken);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0),
