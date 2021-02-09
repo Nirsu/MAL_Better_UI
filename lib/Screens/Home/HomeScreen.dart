@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/constants.dart';
@@ -18,7 +19,6 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   @override
   void initState() {
     super.initState();
-    _loadStorage();
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -44,24 +44,29 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   Widget _buildList(list) {
     Map<String, dynamic> listMap = jsonDecode(list.body);
     dynamic listMapData = listMap['data'];
-    return ListView.builder(
+    return listMapData != null ? ListView.builder(
       itemBuilder: (context, index) {
         return Card(
           child: _buildListTile(listMapData[index]),
         );
       },
       itemCount: listMapData.length,
+    ) : Center(
+      child: Text('ERROR : Failed to get anime list', style: TextStyle(color: kSecondaryColor),)
     );
   }
 
   Future<http.Response> getListAnime() async {
-    return http.get(
+    await _loadStorage();
+    var response = http.get(
       'https://api.myanimelist.net/v2/users/@me/animelist?status=watching&limit=20',
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
+    return response;
   }
 
-    Future<http.Response> getListManga() async {
+  Future<http.Response> getListManga() async {
+    await _loadStorage();
     return http.get(
       'https://api.myanimelist.net/v2/users/@me/mangalist?status=reading&limit=20',
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
@@ -73,7 +78,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
       body: FutureBuilder (
         future: function,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
             return _buildList(snapshot.data);
           } else {
             return Center(
@@ -118,7 +123,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: kPrimaryColor,
