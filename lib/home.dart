@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/constants.dart';
 
 import 'Screens/Home/HomeScreen.dart';
+import 'Screens/Search/SearchScreen.dart';
 
 class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
@@ -12,13 +13,11 @@ class HomePageState extends State<HomePage> {
   String accessToken;
   int _selectedIndex = 0;
 
-  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white);
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white);
   List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    Text(
-      'Index 1: Search',
-      style: optionStyle,
-    ),
+    SearchScreen(),
     Text(
       'Index 2: Profile',
       style: optionStyle,
@@ -47,12 +46,14 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0),
-        child: AppBar(backgroundColor: kPrimaryColor,),
+        child: AppBar(
+          backgroundColor: kPrimaryColor,
+        ),
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

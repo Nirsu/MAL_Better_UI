@@ -36,6 +36,7 @@ dependencies:
   flutter_webview_plugin: ^0.3.11
   http: ^0.12.2
   shared_preferences: ^0.5.12+4
+  flappy_search_bar: ^1.7.2
 
 dev_dependencies:
   flutter_test:
