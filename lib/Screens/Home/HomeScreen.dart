@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/constants.dart';
 import 'package:http/http.dart' as http;
+
+import '../../Components/customCard.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreenState createState() => HomeScreenState();
@@ -33,21 +34,28 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     this.accessToken = prefs.getString('access_token');
   }
 
-  Widget _buildListTile(animeInfo) {
-    return ListTile(
-      leading: new Image.network(animeInfo['node']['main_picture']['large']),
-      title: new Text(animeInfo['node']['title']),
-      onTap: () => {},
-    );
-  }
+  // Widget _buildListTile(animeInfo) {
+  //   return ListTile(
+  //     leading: new Image.network(animeInfo['node']['main_picture']['large']),
+  //     title: new Text(animeInfo['node']['title']),
+  //     onTap: () => {},
+  //   );
+  // }
 
   Widget _buildList(list) {
     Map<String, dynamic> listMap = jsonDecode(list.body);
     dynamic listMapData = listMap['data'];
     return listMapData != null ? ListView.builder(
       itemBuilder: (context, index) {
-        return Card(
-          child: _buildListTile(listMapData[index]),
+        // return Card(
+        //   child: _buildListTile(listMapData[index]),
+        // );
+        return Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: AnimeListCard(
+            title: listMapData[index]['node']['title'],
+            image: listMapData[index]['node']['main_picture']['large'],
+          ),
         );
       },
       itemCount: listMapData.length,
