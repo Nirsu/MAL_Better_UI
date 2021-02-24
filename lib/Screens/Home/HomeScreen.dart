@@ -7,13 +7,14 @@ import 'package:myapp/constants.dart';
 import 'package:http/http.dart' as http;
 
 import '../../Components/customCard.dart';
+import '../Infos/InfoScene.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
-
+class HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   TabController _tabController;
   String accessToken;
 
@@ -34,34 +35,39 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     this.accessToken = prefs.getString('access_token');
   }
 
-  // Widget _buildListTile(animeInfo) {
-  //   return ListTile(
-  //     leading: new Image.network(animeInfo['node']['main_picture']['large']),
-  //     title: new Text(animeInfo['node']['title']),
-  //     onTap: () => {},
-  //   );
-  // }
-
-  Widget _buildList(list) {
+  Widget _buildList(list, type) {
     Map<String, dynamic> listMap = jsonDecode(list.body);
     dynamic listMapData = listMap['data'];
-    return listMapData != null ? ListView.builder(
-      itemBuilder: (context, index) {
-        // return Card(
-        //   child: _buildListTile(listMapData[index]),
-        // );
-        return Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: AnimeListCard(
-            title: listMapData[index]['node']['title'],
-            image: listMapData[index]['node']['main_picture']['large'],
-          ),
-        );
-      },
-      itemCount: listMapData.length,
-    ) : Center(
-      child: Text('ERROR : Failed to get anime list', style: TextStyle(color: kSecondaryColor),)
-    );
+    return listMapData != null
+        ? ListView.builder(
+            itemBuilder: (context, index) {
+              return Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => InfoScene(
+                                    idParam: listMapData[index]['node']['id']
+                                        .toString(),
+                                    typeParam: type,
+                                  )));
+                    },
+                    child: AnimeListCard(
+                      title: listMapData[index]['node']['title'],
+                      image: listMapData[index]['node']['main_picture']
+                          ['large'],
+                    ),
+                  ));
+            },
+            itemCount: listMapData.length,
+          )
+        : Center(
+            child: Text(
+            'ERROR : Failed to get anime list',
+            style: TextStyle(color: kSecondaryColor),
+          ));
   }
 
   Future<http.Response> getListAnime() async {
@@ -81,13 +87,14 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     );
   }
 
-  Widget printList(function) {
-    return Scaffold (
-      body: FutureBuilder (
+  Widget printList(function, type) {
+    return Scaffold(
+      body: FutureBuilder(
         future: function,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-            return _buildList(snapshot.data);
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            return _buildList(snapshot.data, type);
           } else {
             return Center(
               child: CircularProgressIndicator(),
@@ -123,8 +130,8 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     return TabBarView(
       controller: _tabController,
       children: [
-        this.printList(this.getListAnime()),
-        this.printList(this.getListManga()),
+        this.printList(this.getListAnime(), 'anime'),
+        this.printList(this.getListManga(), 'manga'),
       ],
     );
   }
@@ -132,14 +139,13 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: kPrimaryColor,
-        flexibleSpace: SafeArea(
-          child: getTabBar(),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: kPrimaryColor,
+          flexibleSpace: SafeArea(
+            child: getTabBar(),
+          ),
         ),
-      ),
-      body: getTabBarPages()
-    );
+        body: getTabBarPages());
   }
 }
