@@ -170,7 +170,10 @@ class ProfileSceneState extends State<ProfileScene> {
                 children: <Widget>[
                   Indicator(
                     color: Color(0xff0293ee),
-                    text: 'Nbr Days \nWatched %',
+                    text: 'Nbr Days \nWatched %\n(' +
+                        infoMap['anime_statistics']['num_days_watched']
+                            .toString() +
+                        'days)',
                     isSquare: true,
                   ),
                   SizedBox(
@@ -178,7 +181,10 @@ class ProfileSceneState extends State<ProfileScene> {
                   ),
                   Indicator(
                     color: Color(0xfff8b250),
-                    text: 'Nbr Days \nWatching%',
+                    text: 'Nbr Days \nWatching %\n(' +
+                        infoMap['anime_statistics']['num_days_watching']
+                            .toString() +
+                        'days)',
                     isSquare: true,
                   ),
                   SizedBox(
@@ -186,7 +192,10 @@ class ProfileSceneState extends State<ProfileScene> {
                   ),
                   Indicator(
                     color: Color(0xff845bef),
-                    text: 'Nbr Days \nWatched%',
+                    text: 'Nbr Days \nCompleted %\n(' +
+                        infoMap['anime_statistics']['num_days_completed']
+                            .toString() +
+                        'days)',
                     isSquare: true,
                   ),
                   SizedBox(
@@ -194,7 +203,7 @@ class ProfileSceneState extends State<ProfileScene> {
                   ),
                   Indicator(
                     color: Color(0xff13d38e),
-                    text: 'Nbr Days \n22y %',
+                    text: 'Nbr Days \n22y %\n(8030 days)',
                     isSquare: true,
                   ),
                   SizedBox(
