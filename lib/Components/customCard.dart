@@ -70,6 +70,8 @@ class AnimeListCard extends StatelessWidget {
   final Function press;
   final Color color, textColor;
   final String image;
+  final int episodeUser;
+  final int maxEpisode;
 
   const AnimeListCard({
     Key key,
@@ -78,6 +80,8 @@ class AnimeListCard extends StatelessWidget {
     this.color = kSecondaryColor,
     this.textColor = Colors.black,
     this.image,
+    this.episodeUser,
+    this.maxEpisode,
   }) : super(key: key);
 
   @override
@@ -145,6 +149,17 @@ class AnimeListCard extends StatelessWidget {
                             ),
                             padding: EdgeInsets.all(3.0),
                             shape: CircleBorder(),
+                          ),
+                          Text(
+                            this.episodeUser.toString() +
+                                ' / ' +
+                                this.maxEpisode.toString(),
+                            // this.episodeUser + '/' + this.maxEpisode,
+                            style: TextStyle(
+                              color: kSecondaryColor,
+                              fontSize: 25.0,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           RawMaterialButton(
                             onPressed: null,

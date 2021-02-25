@@ -41,6 +41,7 @@ class InfoSceneState extends State<InfoScene> {
     "on_hold",
     "dropped",
     "plan_to_watch",
+    "currently_airing",
   ];
 
   _loadStorage() async {
@@ -48,8 +49,44 @@ class InfoSceneState extends State<InfoScene> {
     this.accessToken = prefs.getString('access_token');
   }
 
+  _printRecommendations(listRecommendations) {
+    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+      Text(
+        'Recommendations',
+        style: TextStyle(
+            fontSize: 25, color: kSecondaryColor, fontWeight: FontWeight.w700),
+      ),
+      SizedBox(
+        height: 200.0,
+        child: ListView.builder(
+          physics: ClampingScrollPhysics(),
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: listRecommendations.length,
+          itemBuilder: (BuildContext context, int index) => Card(
+            child: Center(
+                child: Image.network(
+              listRecommendations[index]['node']['main_picture']['large'],
+            )),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  _checkInfoStatus(infoMap) {
+    return infoMap['my_list_status'] == null
+        ? Text(
+            'Not in your list',
+            style: TextStyle(color: kSecondaryColor),
+          )
+        : Text(
+            infoMap['my_list_status']['status'],
+            style: TextStyle(color: kSecondaryColor),
+          );
+  }
+
   _printGenres(listGenre) {
-    print(listGenre);
     return SizedBox(
       height: 50,
       child: ListView.builder(
@@ -93,6 +130,7 @@ class InfoSceneState extends State<InfoScene> {
   }
 
   Widget _buildInfo(info) {
+    print(this.idParam);
     Map<String, dynamic> infoMap = jsonDecode(info.body);
     return Scaffold(
         body: SafeArea(
@@ -134,10 +172,7 @@ class InfoSceneState extends State<InfoScene> {
                   ),
                 ),
                 DropdownButton(
-                  hint: Text(
-                    infoMap['my_list_status']['status'],
-                    style: TextStyle(color: kSecondaryColor),
-                  ),
+                  hint: _checkInfoStatus(infoMap),
                   value: valueStatus,
                   onChanged: (newValue) {
                     setState(() {
@@ -191,6 +226,7 @@ class InfoSceneState extends State<InfoScene> {
               indent: 30,
               endIndent: 30,
             ),
+            Container(child: _printRecommendations(infoMap['recommendations'])),
             Text('dsqmldskmqdksm'),
           ],
         ),

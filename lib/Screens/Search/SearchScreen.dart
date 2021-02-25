@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 
 import '../../Components/customCard.dart';
+import '../Infos/InfoScene.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreenState createState() => SearchScreenState();
@@ -44,12 +45,24 @@ class SearchScreenState extends State<SearchScreen> {
             child: new ListView.builder(
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child: SearchCard(
-                    title: listMapData[index]["node"]['title'],
-                    image: listMapData[index]['node']['main_picture']['large'],
-                  ),
-                );
+                    padding: const EdgeInsets.all(6.0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InfoScene(
+                                      idParam: listMapData[index]['node']['id']
+                                          .toString(),
+                                      typeParam: 'anime',
+                                    )));
+                      },
+                      child: SearchCard(
+                        title: listMapData[index]["node"]['title'],
+                        image: listMapData[index]['node']['main_picture']
+                            ['large'],
+                      ),
+                    ));
               },
               itemCount: listMapData.length,
             ),

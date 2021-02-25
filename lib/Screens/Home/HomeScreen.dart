@@ -58,6 +58,9 @@ class HomeScreenState extends State<HomeScreen>
                       title: listMapData[index]['node']['title'],
                       image: listMapData[index]['node']['main_picture']
                           ['large'],
+                      episodeUser: listMapData[index]['list_status']
+                          ['num_episodes_watched'],
+                      maxEpisode: listMapData[index]['node']['num_episodes'],
                     ),
                   ));
             },
@@ -73,7 +76,7 @@ class HomeScreenState extends State<HomeScreen>
   Future<http.Response> getListAnime() async {
     await _loadStorage();
     var response = http.get(
-      'https://api.myanimelist.net/v2/users/@me/animelist?status=watching&limit=20',
+      'https://api.myanimelist.net/v2/users/@me/animelist?status=watching&fields=list_status,num_episodes&limit=20',
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
     return response;
@@ -82,7 +85,7 @@ class HomeScreenState extends State<HomeScreen>
   Future<http.Response> getListManga() async {
     await _loadStorage();
     return http.get(
-      'https://api.myanimelist.net/v2/users/@me/mangalist?status=reading&limit=20',
+      'https://api.myanimelist.net/v2/users/@me/mangalist?status=reading&fields=list_status,num_episodes&limit=20',
       headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
     );
   }
