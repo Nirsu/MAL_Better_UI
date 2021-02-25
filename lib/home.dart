@@ -4,6 +4,7 @@ import 'package:myapp/constants.dart';
 
 import 'Screens/Home/HomeScreen.dart';
 import 'Screens/Search/SearchScreen.dart';
+import 'Screens/Profile/ProfileScreen.dart';
 
 class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
@@ -18,10 +19,7 @@ class HomePageState extends State<HomePage> {
   List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     SearchScreen(),
-    Text(
-      'Index 2: Profile',
-      style: optionStyle,
-    ),
+    ProfileScene(),
   ];
 
   void _onItemTapped(int index) {

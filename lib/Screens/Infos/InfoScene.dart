@@ -130,7 +130,6 @@ class InfoSceneState extends State<InfoScene> {
   }
 
   Widget _buildInfo(info) {
-    print(this.idParam);
     Map<String, dynamic> infoMap = jsonDecode(info.body);
     return Scaffold(
         body: SafeArea(
