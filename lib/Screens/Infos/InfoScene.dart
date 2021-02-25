@@ -74,6 +74,12 @@ class InfoSceneState extends State<InfoScene> {
     ]);
   }
 
+  _checkInfoEpisode(infoMap) {
+    return infoMap['my_list_status'] == null
+        ? 0
+        : infoMap['my_list_status']['num_episodes_watched'];
+  }
+
   _checkInfoStatus(infoMap) {
     return infoMap['my_list_status'] == null
         ? Text(
@@ -114,6 +120,18 @@ class InfoSceneState extends State<InfoScene> {
                     )),
               ))),
     );
+  }
+
+  void _updateAnime(String status, int nbrWatchedEpisodes, String id) async {
+    var response = await http.patch(
+      'https://api.myanimelist.net/v2/anime/' + id + '/my_list_status',
+      headers: {HttpHeaders.authorizationHeader: 'Bearer $accessToken'},
+      body: {
+        'status': status,
+        'num_watched_episodes': nbrWatchedEpisodes.toString(),
+      },
+    );
+    print(response.body);
   }
 
   Future<http.Response> getInfosAnimeMangas(String id, String type) async {
@@ -176,6 +194,8 @@ class InfoSceneState extends State<InfoScene> {
                   onChanged: (newValue) {
                     setState(() {
                       valueStatus = newValue;
+                      _updateAnime(valueStatus, _checkInfoEpisode(infoMap),
+                          this.idParam);
                     });
                   },
                   items: animeStatus.map((valueItem) {
@@ -187,6 +207,51 @@ class InfoSceneState extends State<InfoScene> {
                       ),
                     );
                   }).toList(),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(80, 2, 2, 2),
+                  child: Row(
+                    children: [
+                      RawMaterialButton(
+                        onPressed: () {
+                          _updateAnime(infoMap['my_list_status']['status'],
+                              _checkInfoEpisode(infoMap) + 1, this.idParam);
+                        },
+                        elevation: 2.0,
+                        fillColor: kSecondaryColor,
+                        child: Icon(
+                          Icons.add,
+                          size: 30,
+                        ),
+                        padding: EdgeInsets.all(3.0),
+                        shape: CircleBorder(),
+                      ),
+                      Text(
+                        _checkInfoEpisode(infoMap).toString() +
+                            ' / ' +
+                            infoMap['num_episodes'].toString(),
+                        style: TextStyle(
+                          color: kSecondaryColor,
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      RawMaterialButton(
+                        onPressed: () {
+                          _updateAnime(infoMap['my_list_status']['status'],
+                              _checkInfoEpisode(infoMap) - 1, this.idParam);
+                        },
+                        elevation: 2.0,
+                        fillColor: kSecondaryColor,
+                        child: Icon(
+                          Icons.remove,
+                          size: 30,
+                        ),
+                        padding: EdgeInsets.all(3.0),
+                        shape: CircleBorder(),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -226,7 +291,7 @@ class InfoSceneState extends State<InfoScene> {
               endIndent: 30,
             ),
             Container(child: _printRecommendations(infoMap['recommendations'])),
-            Text('dsqmldskmqdksm'),
+            // Text('dsqmldskmqdksm'),
           ],
         ),
       ),
